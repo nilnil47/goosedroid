@@ -1,5 +1,6 @@
 package org.andcoe.floatingwidget
 
+import android.app.Application
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -9,16 +10,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Application() {
 
     companion object {
         private const val DRAW_OVERLAYS_PERMISSION_REQUEST_CODE = 666
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        startFloatingWidget.setOnClickListener { startFloatingWidgetMaybe() }
+    override fun onCreate() {
+        super.onCreate()
+        startFloatingWidgetMaybe()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
