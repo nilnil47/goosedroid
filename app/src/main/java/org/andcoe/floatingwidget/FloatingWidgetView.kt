@@ -6,6 +6,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 
@@ -31,7 +33,9 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
     private val windowManager: WindowManager
 
     init {
-        View.inflate(context, R.layout.floating_widget_layout, this)
+        var view = inflate(context, R.layout.floating_widget_layout, this)
+//        view.findViewById<>(R.id.)
+
         setOnTouchListener(this)
 
         layoutParams.x = x
@@ -39,6 +43,14 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
 
         windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowManager.addView(this, layoutParams)
+
+        val animation: Animation = TranslateAnimation(0f, 100f, 0f, 0f)
+        // set Animation for 5 sec
+        animation.setDuration(5000)
+//for button stops in the new position.
+//for button stops in the new position.
+        animation.setFillAfter(true)
+        startAnimation(animation)
     }
 
     companion object {
