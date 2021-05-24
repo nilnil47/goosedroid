@@ -30,8 +30,8 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-//        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+//        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
         PixelFormat.TRANSLUCENT
     )
 
@@ -55,28 +55,29 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
         windowManager.addView(this, layoutParams)
 
 
-//        layoutParams.x = -500
-//        layoutParams.y = 1000
+//        layoutParams.x = 500
+//        layoutParams.y = 0
 //        windowManager.updateViewLayout(this, layoutParams)
 
 //        val path = Path().apply {
 //            arcTo(0f, 0f, 1000f, 1000f, 270f, -180f, true)
 //        }
-        val animator = ObjectAnimator.ofFloat(this, "x", 300f).apply {
-            duration = 2000
-            start()
-        }
+//        val animator = ObjectAnimator.ofFloat(this, "x", 300f).apply {
+//            duration = 2000
+//            start()
+//        }
     }
 
-    override fun setX(x: Float) {
-        super.setX(x)
+    fun setParamsX(x: Float) {
         layoutParams.x = x.toInt()
+        Log.d(TAG, "setX: ${layoutParams.x}")
         windowManager.updateViewLayout(this, layoutParams)
     }
 
-    override fun setY(x: Float) {
-        super.setX(x)
-        layoutParams.y = x.toInt()
+    fun setParamsY(y: Float) {
+        Log.d(TAG, "setY: ${layoutParams.y}")
+        layoutParams.y = y.toInt()
+        windowManager.updateViewLayout(this, layoutParams)
     }
 
     companion object {
@@ -96,6 +97,13 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
                 touchY = event.rawY
 
                 gooseImage.rotation = 50f
+
+                val animator = ObjectAnimator.ofFloat(this, "paramsX", 300f).apply {
+                    duration = 2000
+                    start()
+                }
+//                setParamsX(100f)
+//                windowManager.updateViewLayout(this, layoutParams)
 
             }
             MotionEvent.ACTION_UP -> {
