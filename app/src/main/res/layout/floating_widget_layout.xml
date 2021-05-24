@@ -8,7 +8,7 @@
         android:id="@+id/floatingIcon"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:src="@drawable/ic_baseline_account_circle_24px"
+        android:src="@drawable/desktop_goose_logo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
