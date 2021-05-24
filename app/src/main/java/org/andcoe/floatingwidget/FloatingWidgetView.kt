@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Path
 import android.graphics.PixelFormat
+import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -12,29 +13,35 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import kotlin.random.Random
 
 
 const val TAG = "gooseFloatingWidget"
+
+const val animationTime: Long = 2000
 
 class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
 
+    private val positionHandler: Handler = Handler()
     private var gooseImage: ImageView
     private val layoutParams = WindowManager.LayoutParams(
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-//        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+//        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
         PixelFormat.TRANSLUCENT
     )
 
-//    private var x: Int = 0
-//    private var y: Int = 0
     private var touchX: Float = 0f
     private var touchY: Float = 0f
     private var clickStartTimer: Long = 0
@@ -46,25 +53,24 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
 
         setOnTouchListener(this)
 
-//        layoutParams.x = x
-//        layoutParams.y = y
-
         windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowManager.addView(this, layoutParams)
-
-
-        layoutParams.x = 500
-        layoutParams.y = 0
-        windowManager.updateViewLayout(this, layoutParams)
-
-//        val path = Path().apply {
-//            arcTo(0f, 0f, 1000f, 1000f, 270f, -180f, true)
-//        }
-//        val animator = ObjectAnimator.ofFloat(this, "x", 300f).apply {
-//            duration = 2000
-//            start()
-//        }
+        startWalking()
     }
+
+    //
+    fun startWalking() {
+        val runnable: Runnable = object : Runnable {
+            override fun run() {
+                val x: Float = Random.nextInt(-500, 500).toFloat()
+                val y: Float = Random.nextInt(-500, 500).toFloat()
+                goto(x, y)
+                positionHandler.postDelayed(this, animationTime)
+            }
+        }
+        positionHandler.post(runnable)
+    }
+
 
     fun setParamsX(x: Float) {
         layoutParams.x = x.toInt()
@@ -82,19 +88,25 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
         private const val CLICK_DELTA = 200
     }
 
-    fun goto(x : Float, y : Float) {
-        Log.d(TAG, "goto: x: ${layoutParams.x.toFloat()} -> $x y: ${layoutParams.y.toFloat()} -> $y")
+
+    fun goto(x: Float, y: Float) {
+        Log.d(
+            TAG,
+            "goto: x: ${layoutParams.x.toFloat()} -> $x y: ${layoutParams.y.toFloat()} -> $y"
+        )
         val path = Path().apply {
 //            arcTo(0f, 0f, x, y, 270f, -180f, true)
 //            lineTo(200f, 50f)
 
         }
 
-        val objectAnimatorParamsX = ObjectAnimator.ofFloat(this, "paramsX", layoutParams.x.toFloat(), x)
-        val objectAnimatorParamsY = ObjectAnimator.ofFloat(this, "paramsY", layoutParams.y.toFloat(), y)
+        val objectAnimatorParamsX =
+            ObjectAnimator.ofFloat(this, "paramsX", layoutParams.x.toFloat(), x)
+        val objectAnimatorParamsY =
+            ObjectAnimator.ofFloat(this, "paramsY", layoutParams.y.toFloat(), y)
         val animatorSet = AnimatorSet().apply {
             playTogether(objectAnimatorParamsX, objectAnimatorParamsY)
-            duration = 2000
+            duration = animationTime
             start()
         }
 //        val animator = ObjectAnimator.ofFloat(this, "paramsX", "paramsY", path).apply {
@@ -108,9 +120,6 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
             MotionEvent.ACTION_DOWN -> {
                 Log.d(TAG, "touch down: ")
 //                clickStartTimer = System.currentTimeMillis()
-
-//                x = layoutParams.x
-//                y = layoutParams.y
 
                 touchX = event.rawX
                 touchY = event.rawY
