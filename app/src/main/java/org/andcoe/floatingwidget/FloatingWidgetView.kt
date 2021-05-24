@@ -1,8 +1,11 @@
 package org.andcoe.floatingwidget
 
+import android.animation.ObjectAnimator
 import android.content.Context
+import android.graphics.Path
 import android.graphics.PixelFormat
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
@@ -11,6 +14,9 @@ import android.view.animation.TranslateAnimation
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import kotlin.math.log
+
+const val TAG = "gooseFloatingWidget"
 
 class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
 
@@ -18,11 +24,14 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
+
+    private var gooseImage: ImageView
     private val layoutParams = WindowManager.LayoutParams(
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+//        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
         PixelFormat.TRANSLUCENT
     )
 
@@ -34,8 +43,8 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
     private val windowManager: WindowManager
 
     init {
-        var view = inflate(context, R.layout.floating_widget_layout, this)
-        view.findViewById<ImageView>(R.id.floatingIcon)
+        val view = inflate(context, R.layout.floating_widget_layout, this)
+        gooseImage = view.findViewById<ImageView>(R.id.floatingIcon)
 
         setOnTouchListener(this)
 
@@ -45,12 +54,26 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
         windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowManager.addView(this, layoutParams)
 
-        val animation: Animation = TranslateAnimation(0f, 500f, 0f, 0f)
-        // set Animation for 5 sec
-        animation.setDuration(5000)
-//for button stops in the new position.
-        animation.setFillAfter(true)
-        startAnimation(animation)
+//        val animation: Animation = TranslateAnimation(0f, 500f, 0f, 0f)
+//        // set Animation for 5 sec
+//        animation.setDuration(5000)
+////for button stops in the new position.
+//        animation.setFillAfter(true)
+//        startAnimation(animation)
+
+        layoutParams.x = -500
+        layoutParams.y = 1000
+        windowManager.updateViewLayout(this, layoutParams)
+
+//        val path = Path().apply {
+//            arcTo(0f, 0f, 1000f, 1000f, 270f, -180f, true)
+//        }
+//        val animator = ObjectAnimator.ofFloat(view, View.X, View.Y, path).apply {
+//            duration = 2000
+//            start()
+//        }
+
+
     }
 
     companion object {
@@ -60,6 +83,7 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
+                Log.d(TAG, "touch down: ")
                 clickStartTimer = System.currentTimeMillis()
 
                 x = layoutParams.x
@@ -67,6 +91,9 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
 
                 touchX = event.rawX
                 touchY = event.rawY
+
+                gooseImage.rotation = 50f
+
             }
             MotionEvent.ACTION_UP -> {
                 if (System.currentTimeMillis() - clickStartTimer < CLICK_DELTA) {
@@ -76,6 +103,7 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
             MotionEvent.ACTION_MOVE -> {
                 layoutParams.x = (x + event.rawX - touchX).toInt()
                 layoutParams.y = (y + event.rawY - touchY).toInt()
+                Log.d(TAG, "onTouch: ${layoutParams.x}, ${layoutParams.y}")
                 windowManager.updateViewLayout(this, layoutParams)
             }
         }
