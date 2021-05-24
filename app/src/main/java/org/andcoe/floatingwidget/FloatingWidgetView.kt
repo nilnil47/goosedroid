@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Path
 import android.graphics.PixelFormat
+import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -84,6 +85,17 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
         private const val CLICK_DELTA = 200
     }
 
+    fun goto(x : Float, y : Float) {
+        val path = Path().apply {
+//            arcTo(0f, 0f, x, y, 270f, -180f, true)
+            quadTo(layoutParams.x.toFloat(), layoutParams.y.toFloat(), x, y)
+        }
+        val animator = ObjectAnimator.ofFloat(this, "paramsX", "paramsY", path).apply {
+            duration = 2000
+            start()
+        }
+    }
+
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -98,10 +110,12 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
 
                 gooseImage.rotation = 50f
 
-                val animator = ObjectAnimator.ofFloat(this, "paramsX", 300f).apply {
-                    duration = 2000
-                    start()
-                }
+//                val animator = ObjectAnimator.ofFloat(this, "paramsX", 300f).apply {
+//                    duration = 2000
+//                    start()
+//                }
+
+                goto(300f, 300f)
 //                setParamsX(100f)
 //                windowManager.updateViewLayout(this, layoutParams)
 
