@@ -1,21 +1,18 @@
 package org.andcoe.floatingwidget
 
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Path
 import android.graphics.PixelFormat
-import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.TranslateAnimation
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
-import kotlin.math.log
+
 
 const val TAG = "gooseFloatingWidget"
 
@@ -31,13 +28,13 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-//        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+//        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
         PixelFormat.TRANSLUCENT
     )
 
-    private var x: Int = 0
-    private var y: Int = 0
+//    private var x: Int = 0
+//    private var y: Int = 0
     private var touchX: Float = 0f
     private var touchY: Float = 0f
     private var clickStartTimer: Long = 0
@@ -49,16 +46,16 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
 
         setOnTouchListener(this)
 
-        layoutParams.x = x
-        layoutParams.y = y
+//        layoutParams.x = x
+//        layoutParams.y = y
 
         windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowManager.addView(this, layoutParams)
 
 
-//        layoutParams.x = 500
-//        layoutParams.y = 0
-//        windowManager.updateViewLayout(this, layoutParams)
+        layoutParams.x = 500
+        layoutParams.y = 0
+        windowManager.updateViewLayout(this, layoutParams)
 
 //        val path = Path().apply {
 //            arcTo(0f, 0f, 1000f, 1000f, 270f, -180f, true)
@@ -86,27 +83,40 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
     }
 
     fun goto(x : Float, y : Float) {
+        Log.d(TAG, "goto: x: ${layoutParams.x.toFloat()} -> $x y: ${layoutParams.y.toFloat()} -> $y")
         val path = Path().apply {
 //            arcTo(0f, 0f, x, y, 270f, -180f, true)
-            quadTo(layoutParams.x.toFloat(), layoutParams.y.toFloat(), x, y)
+//            lineTo(200f, 50f)
+
         }
-        val animator = ObjectAnimator.ofFloat(this, "paramsX", "paramsY", path).apply {
+
+        val objectAnimatorParamsX = ObjectAnimator.ofFloat(this, "paramsX", layoutParams.x.toFloat(), x)
+        val objectAnimatorParamsY = ObjectAnimator.ofFloat(this, "paramsY", layoutParams.y.toFloat(), y)
+        val animatorSet = AnimatorSet().apply {
+            playTogether(objectAnimatorParamsX, objectAnimatorParamsY)
             duration = 2000
             start()
         }
+//        val animator = ObjectAnimator.ofFloat(this, "paramsX", "paramsY", path).apply {
+//            duration = 2000
+//            start()
+//        }
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 Log.d(TAG, "touch down: ")
-                clickStartTimer = System.currentTimeMillis()
+//                clickStartTimer = System.currentTimeMillis()
 
-                x = layoutParams.x
-                y = layoutParams.y
+//                x = layoutParams.x
+//                y = layoutParams.y
 
                 touchX = event.rawX
                 touchY = event.rawY
+
+                Log.d(TAG, "onTouch: - layoutparams: ${layoutParams.x}, ${layoutParams.y}")
+                goto(touchX, touchY)
 
                 gooseImage.rotation = 50f
 
@@ -115,21 +125,21 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
 //                    start()
 //                }
 
-                goto(300f, 300f)
+//                goto(300f, 300f)
 //                setParamsX(100f)
 //                windowManager.updateViewLayout(this, layoutParams)
 
-            }
-            MotionEvent.ACTION_UP -> {
-                if (System.currentTimeMillis() - clickStartTimer < CLICK_DELTA) {
-                    Toast.makeText(context, "clicked floating widget", Toast.LENGTH_SHORT).show()
-                }
-            }
-            MotionEvent.ACTION_MOVE -> {
-                layoutParams.x = (x + event.rawX - touchX).toInt()
-                layoutParams.y = (y + event.rawY - touchY).toInt()
-                Log.d(TAG, "onTouch: ${layoutParams.x}, ${layoutParams.y}")
-                windowManager.updateViewLayout(this, layoutParams)
+//            }
+//            MotionEvent.ACTION_UP -> {
+//                if (System.currentTimeMillis() - clickStartTimer < CLICK_DELTA) {
+//                    Toast.makeText(context, "clicked floating widget", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//            MotionEvent.ACTION_MOVE -> {
+//                layoutParams.x = (x + event.rawX - touchX).toInt()
+//                layoutParams.y = (y + event.rawY - touchY).toInt()
+//                Log.d(TAG, "onTouch: ${layoutParams.x}, ${layoutParams.y}")
+//                windowManager.updateViewLayout(this, layoutParams)
             }
         }
         return true
