@@ -54,26 +54,29 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
         windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowManager.addView(this, layoutParams)
 
-//        val animation: Animation = TranslateAnimation(0f, 500f, 0f, 0f)
-//        // set Animation for 5 sec
-//        animation.setDuration(5000)
-////for button stops in the new position.
-//        animation.setFillAfter(true)
-//        startAnimation(animation)
 
-        layoutParams.x = -500
-        layoutParams.y = 1000
-        windowManager.updateViewLayout(this, layoutParams)
+//        layoutParams.x = -500
+//        layoutParams.y = 1000
+//        windowManager.updateViewLayout(this, layoutParams)
 
 //        val path = Path().apply {
 //            arcTo(0f, 0f, 1000f, 1000f, 270f, -180f, true)
 //        }
-//        val animator = ObjectAnimator.ofFloat(view, View.X, View.Y, path).apply {
-//            duration = 2000
-//            start()
-//        }
+        val animator = ObjectAnimator.ofFloat(this, "x", 300f).apply {
+            duration = 2000
+            start()
+        }
+    }
 
+    override fun setX(x: Float) {
+        super.setX(x)
+        layoutParams.x = x.toInt()
+        windowManager.updateViewLayout(this, layoutParams)
+    }
 
+    override fun setY(x: Float) {
+        super.setX(x)
+        layoutParams.y = x.toInt()
     }
 
     companion object {
