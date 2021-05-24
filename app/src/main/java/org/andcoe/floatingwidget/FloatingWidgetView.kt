@@ -62,8 +62,8 @@ class FloatingWidgetView : ConstraintLayout, View.OnTouchListener {
     fun startWalking() {
         val runnable: Runnable = object : Runnable {
             override fun run() {
-                val x: Float = Random.nextInt(-500, 500).toFloat()
-                val y: Float = Random.nextInt(-500, 500).toFloat()
+                val x: Float = Random.nextInt(-800, 800).toFloat()
+                val y: Float = Random.nextInt(-1500, 1500).toFloat()
                 goto(x, y)
                 positionHandler.postDelayed(this, animationTime)
             }
